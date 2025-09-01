@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: notesdb
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres -d notesdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment:
+      APP_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: admin
+      DB_NAME: notesdb
+      JWT_SECRET: supersecretjwt
+      UPLOAD_DIR: /app/uploads
+    depends_on: { db: { condition: service_healthy } }
+    ports: ["8080:8080"]
+    # ⬇️ pakai folder host, bukan named volume
+    volumes:
+      - ./backend/uploads:/app/uploads
+
+  web:
+    build: ./frontend
+    environment:
+      # ⬇️ penting untuk browser
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    depends_on: [api]
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:
+  # uploads:  # (tak lagi dipakai; boleh dihapus)
