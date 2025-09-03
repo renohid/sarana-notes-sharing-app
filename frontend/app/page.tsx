@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = localStorage.getItem("token");
     router.replace(token ? "/notes" : "/login");
   }, [router]);
-  return null;
+
+  return null; // atau <p>Redirecting...</p>
 }

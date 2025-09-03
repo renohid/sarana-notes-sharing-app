@@ -1,11 +1,9 @@
-# Notes Sharing App
+# Sarana Notes Sharing App
 
-## Stack
-- Backend: Go + Fiber + Postgres + JWT
-- Frontend: Next.js (App Router)
-- Docker Compose untuk dev
+Stack: Go (Fiber) + Postgres + Next.js, Docker Compose.
 
-## Jalankan dengan Docker
-```bash
-docker compose down -v
-docker compose up --build
+## Menjalankan
+`bash
+docker compose up -d --build
+# web: http://localhost:3000
+# api: http://localhost:8080

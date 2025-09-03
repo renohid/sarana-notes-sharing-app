@@ -26,18 +26,18 @@ services:
       UPLOAD_DIR: /app/uploads
     depends_on: { db: { condition: service_healthy } }
     ports: ["8080:8080"]
-    # ⬇️ pakai folder host, bukan named volume
     volumes:
       - ./backend/uploads:/app/uploads
 
   web:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:8080"   # build-time arg
     environment:
-      # ⬇️ penting untuk browser
-      NEXT_PUBLIC_API_URL: http://localhost:8080
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"     # runtime env (optional)
     depends_on: [api]
     ports: ["3000:3000"]
 
 volumes:
   pgdata:
-  # uploads:  # (tak lagi dipakai; boleh dihapus)
