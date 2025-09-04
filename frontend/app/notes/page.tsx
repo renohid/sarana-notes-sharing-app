@@ -1,26 +1,32 @@
-﻿"use client";
+"use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Note = { id: number; title: string; image_url?: string | null };
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
 export default function NotesPage() {
-  const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   const [notes, setNotes] = useState<Note[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch(${api}/notes);
-        const data = r.ok ? await r.json() : [];
+        const r = await fetch(`${API}/notes`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const data: Note[] = await r.json();
         if (!cancelled) setNotes(data);
-      } catch {
-        if (!cancelled) setNotes([]);
+      } catch (e: any) {
+        if (!cancelled) {
+          setErr(e?.message || "fetch failed");
+          setNotes([]);
+        }
       }
     })();
     return () => { cancelled = true; };
-  }, [api]);
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -33,6 +39,8 @@ export default function NotesPage() {
     <div style={{ padding: 24 }}>
       <button style={{ float: "right" }} onClick={logout}>Logout</button>
       <h1>Notes Sharing App</h1>
+      <p><a href="/notes/new">+ New</a></p>
+      {err && <p style={{ color: "crimson" }}>Error: {err}</p>}
 
       {notes.length === 0 ? (
         <p>Belum ada catatan.</p>
@@ -40,10 +48,10 @@ export default function NotesPage() {
         <ul>
           {notes.map((n) => (
             <li key={n.id} style={{ marginBottom: 12 }}>
-              <Link href={/notes/${n.id}}>{n.title}</Link>
+              <Link href={`/notes/${n.id}`}>{n.title}</Link>
               {n.image_url && (
                 <img
-                  src={${api}${n.image_url}}
+                  src={`${API}${n.image_url}`}
                   width={120}
                   alt=""
                   style={{ display: "block", marginTop: 6 }}

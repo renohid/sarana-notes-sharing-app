@@ -3,4 +3,5 @@
 /backend/uploads/
 node_modules
 .next
-.env
+.env.next/
+node_modules/
